@@ -1,4 +1,4 @@
-module holistic-db-migration
+module holistic_db_migration
 
 go 1.19
 
