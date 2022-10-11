@@ -1,17 +1,15 @@
 package main
 
 import (
-	"database/sql"
-	"encoding/base64"
+	//"database/sql"
+	//"encoding/base64"
 	"fmt"
 	"os"
-	"regexp"
-	"strconv"
 	"strings"
-	"unicode"
+	"io/ioutil"
+	"bufio"
 
-	"github.com/go-sql-driver/mysql"
-	_ "github.com/go-sql-driver/mysql"
+	class "github.com/matehaxor03/holistic_db_client/class"
 )
 
 func main() {
@@ -26,34 +24,39 @@ func main() {
 func migrateDatabase() []error {
 	var errors []error
 
-	migration_db_username, migration_db_password := getCredentials("MIGRATION")
-	migration_db_credentials_errs := validateCredentials(migration_db_username, migration_db_password)
-
-	if migration_db_credentials_errs != nil {
-		errors = append(errors, migration_db_credentials_errs...)
+	db_hostname, db_port_number, db_name, migration_db_username, _, migration_details_errors := getDetails("holistic_migration")
+	if migration_details_errors != nil {
+		errors = append(errors, migration_details_errors...)
 	}
 
-	db_hostname := getDatabaseHostname()
-	db_hostname_errors := validateHostname(db_hostname)
-	if db_hostname_errors != nil {
-		errors = append(errors, db_hostname_errors...)
+	host, host_errors := class.NewHost(&db_hostname, &db_port_number)
+	client, client_errors := class.NewClient(host, &migration_db_username, nil)
+
+	if host_errors != nil {
+		errors = append(errors, host_errors...)
 	}
 
-	db_port_number := getPortNumber()
-	db_port_number_err := validatePortNumber(db_port_number)
-	if db_port_number_err != nil {
-		errors = append(errors, db_port_number_err...)
-	}
-
-	db_name := getDatabaseName()
-	db_name_err := validateDatabaseName(db_name)
-	if db_name_err != nil {
-		errors = append(errors, db_name_err...)
+	if client_errors != nil {
+		errors = append(errors, client_errors...)
 	}
 
 	if len(errors) > 0 {
 		return errors
 	}
+
+	database, use_database_errors := client.UseDatabaseByName(db_name)
+	if use_database_errors != nil {
+		return use_database_errors
+	}
+
+	_, table_errors := database.GetTable("DatabaseMigration")
+	if table_errors != nil {
+		return table_errors
+	}
+
+
+
+	/*
 
 	migration_db_password = base64.StdEncoding.EncodeToString([]byte(migration_db_password))
 
@@ -144,10 +147,11 @@ func migrateDatabase() []error {
 			current = current - 1
 		}
 	}
-
+	*/
 	return nil
 }
 
+/*
 func executeMigrationScript(db *sql.DB, databaseMigrationId int, scriptId int, mode string) []error {
 	var errors []error
 	filname := fmt.Sprintf("./scripts/sql/%d-%s.sql", scriptId, mode)
@@ -389,4 +393,91 @@ func validatePassword(password string) []error {
 	}
 
 	return nil
+}
+*/
+
+func getDetails(label string) (string, string, string, string, string, []error) {
+	var errors []error
+
+	files, err := ioutil.ReadDir("./")
+    if err != nil {
+		errors = append(errors, err)
+		return "", "", "", "", "", errors
+    }
+
+	filename := ""
+    for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		currentFileName := file.Name()
+
+		if !strings.HasPrefix(currentFileName, "holistic_db_config:") {
+			continue
+		}
+
+		if !strings.HasSuffix(currentFileName, label + ".config") {
+			continue
+		}		
+		filename = currentFileName
+    }
+
+	if filename == "" {
+		errors = append(errors, fmt.Errorf("database config for %s not found ust be in the format: holistic_db_config|{database_ip_address}|{database_port_number}|{database_name}|{database_username}.config e.g holistic_db_config|127.0.0.1|3306|holistic|root.config", label))
+		return "", "", "", "", "", errors
+	}
+
+	parts := strings.Split(filename, ":")
+	if len(parts) != 5 {
+		errors = append(errors, fmt.Errorf("database config for %s not found ust be in the format: holistic_db_config|{database_ip_address}|{database_port_number}|{database_name}|{database_username}.config e.g holistic_db_config|127.0.0.1|3306|holistic|root.config", label))
+		return "", "", "", "", "", errors
+	}
+
+	ip_address := parts[1]
+	port_number := parts[2]
+	database_name := parts[3]
+
+	password := ""
+	username := ""
+	
+	file, err_file := os.Open(filename)
+
+    if err_file != nil {
+        errors = append(errors, err_file)
+		return "", "", "", "", "", errors
+    }
+
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+
+    for scanner.Scan() {
+		currentText := scanner.Text()
+		if strings.HasPrefix(currentText, "password=") {
+			password = currentText[9:len(currentText)]
+		}
+
+		if strings.HasPrefix(currentText, "user=") {
+			username = currentText[5:len(currentText)]
+		}
+    }
+
+    if file_errs := scanner.Err(); err != nil {
+        errors = append(errors, file_errs)
+    }
+
+	if password == "" {
+		errors = append(errors, fmt.Errorf("password not found for file: %s", filename))
+	}
+
+	if username == "" {
+		errors = append(errors, fmt.Errorf("user not found for file: %s", filename))
+	}
+
+	if len(errors) > 0 {
+		return "", "", "", "", "", errors
+	}
+
+	return ip_address, port_number, database_name, username, password, errors
 }
