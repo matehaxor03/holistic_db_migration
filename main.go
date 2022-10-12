@@ -49,58 +49,27 @@ func migrateDatabase() []error {
 		return use_database_errors
 	}
 
-	_, table_errors := database.GetTable("DatabaseMigration")
+	database_migration_table, table_errors := database.GetTable("DatabaseMigration")
 	if table_errors != nil {
 		return table_errors
 	}
 
-
-
-	/*
-
-	migration_db_password = base64.StdEncoding.EncodeToString([]byte(migration_db_password))
-
-	cfg_migration := mysql.Config{
-		User:   migration_db_username,
-		Passwd: migration_db_password,
-		Net:    "tcp",
-		Addr:   db_hostname + ":" + db_port_number,
-		DBName: db_name,
+	count, count_errors := database_migration_table.Count()
+	if count_errors != nil {
+		return count_errors
 	}
 
-	db, dberr := sql.Open("mysql", cfg_migration.FormatDSN())
-
-	if dberr != nil {
-		errors = append(errors, dberr)
-		defer db.Close()
+	if *count != 1 {
+		errors = append(errors, fmt.Errorf("did not find correct number of records for DatabaseMigration %d records found", *count))
 		return errors
 	}
-	defer db.Close()
 
-	db_results, count_err := db.Query("SELECT COUNT(*) FROM DatabaseMigration")
-	if count_err != nil {
-		fmt.Println("error fetching count of records for DatabaseMigration")
-		errors = append(errors, count_err)
-		defer db.Close()
-		return errors
-	}
-	defer db_results.Close()
-	
-	var count int
-	for db_results.Next() {
-		if err := db_results.Scan(&count); err != nil {
-			errors = append(errors, err)
-			defer db.Close()
-			return errors
-		}
-	}
-	db_results.Close()
 
-	if count != 1 {
-		errors = append(errors, fmt.Errorf("did not find correct number of records for DatabaseMigration %d records found", count))
-		defer db.Close()
-		return errors
-	}
+	return nil
+}
+
+/*
+
 
 	var databaseMigrationId int
 	var current int
@@ -147,9 +116,9 @@ func migrateDatabase() []error {
 			current = current - 1
 		}
 	}
-	*/
+	
 	return nil
-}
+	
 
 /*
 func executeMigrationScript(db *sql.DB, databaseMigrationId int, scriptId int, mode string) []error {
