@@ -88,86 +88,65 @@ func migrateDatabase() []error {
 
 	current := *current_pt
 	desired := *desired_pt
-	SQLCommand := class.NewSQLCommand()
 
 	if current < desired {
 		for current < desired {
 			fmt.Printf("database upgrading from current: %d desired: %d\n", current, desired)
-
 			current = current + 1
-
-			filname := fmt.Sprintf("./scripts/sql/%d-%s.sql", current, "upgrade")
-			raw_sql_command, read_file_error := os.ReadFile(filname) 
-			if read_file_error != nil {
-				errors = append(errors, read_file_error)
-				return errors
-			}
-			
-			raw_sql_command_string := string(raw_sql_command)
-			_, stderr, sql_errors := SQLCommand.ExecuteUnsafeCommand(client, &raw_sql_command_string, class.Map{"use_file":true, "transactional":true})
-			
-			if sql_errors != nil {
-				errors = append(errors, sql_errors...)
-			}
-
-			if stderr != nil && *stderr != "" {
-				if strings.Contains(*stderr, " table exists") {
-					errors = append(errors, fmt.Errorf("create table failed most likely the table already exists"))
-				} else {
-					errors = append(errors, fmt.Errorf(*stderr))
-				}
-			}
-		
-			if len(errors) > 0 {
-				return errors
-			}
-
-			data_migration_record.SetInt64("current", &current)
-			update_errors := data_migration_record.Update()
-			if update_errors != nil {
-				return update_errors
+			downgrade_errors := runScript(client, &data_migration_record, current, "upgrade")
+			if downgrade_errors != nil {
+				return downgrade_errors
 			}
 		}
 	} else if current > desired {
 		for current > desired {	
 			fmt.Printf("database downgrading from current: %d desired: %d\n", current, desired)
-
 			current = current - 1
-
-			filname := fmt.Sprintf("./scripts/sql/%d-%s.sql", current, "downgrade")
-			raw_sql_command, read_file_error := os.ReadFile(filname) 
-			if read_file_error != nil {
-				errors = append(errors, read_file_error)
-				return errors
-			}
-			
-			raw_sql_command_string := string(raw_sql_command)
-			_, stderr, sql_errors := SQLCommand.ExecuteUnsafeCommand(client, &raw_sql_command_string, class.Map{"use_file":true, "transactional":true})
-			
-			if sql_errors != nil {
-				errors = append(errors, sql_errors...)
-			}
-
-			if stderr != nil && *stderr != "" {
-				if strings.Contains(*stderr, " table exists") {
-					errors = append(errors, fmt.Errorf("create table failed most likely the table already exists"))
-				} else {
-					errors = append(errors, fmt.Errorf(*stderr))
-				}
-			}
-		
-			if len(errors) > 0 {
-				return errors
-			}
-
-			data_migration_record.SetInt64("current", &current)
-			update_errors := data_migration_record.Update()
-			if update_errors != nil {
-				return update_errors
+			downgrade_errors := runScript(client, &data_migration_record, current, "downgrade")
+			if downgrade_errors != nil {
+				return downgrade_errors
 			}
 		}
 	} else {
 		fmt.Printf("no database schema changes detected current: %d desired: %d\n", current, desired)
+	}
+
+	return nil
+}
+
+func runScript(client *class.Client, data_migration_record *class.Record, version int64, mode string) []error {
+	SQLCommand := class.NewSQLCommand()
+	var errors []error
+	filname := fmt.Sprintf("./scripts/sql/%d-%s.sql", version, mode)
+	raw_sql_command, read_file_error := os.ReadFile(filname) 
+	if read_file_error != nil {
+		errors = append(errors, read_file_error)
+		return errors
+	}
+	
+	raw_sql_command_string := string(raw_sql_command)
+	_, stderr, sql_errors := SQLCommand.ExecuteUnsafeCommand(client, &raw_sql_command_string, class.Map{"use_file":true, "transactional":true})
+	
+	if sql_errors != nil {
+		errors = append(errors, sql_errors...)
+	}
+
+	if stderr != nil && *stderr != "" {
+		if strings.Contains(*stderr, " table exists") {
+			errors = append(errors, fmt.Errorf("create table failed most likely the table already exists"))
+		} else {
+			errors = append(errors, fmt.Errorf(*stderr))
+		}
+	}
+
+	if len(errors) > 0 {
+		return errors
+	}
+
+	data_migration_record.SetInt64("current", &version)
+	update_errors := data_migration_record.Update()
+	if update_errors != nil {
+		return update_errors
 	}
 
 	return nil
