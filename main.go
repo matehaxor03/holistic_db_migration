@@ -1,12 +1,9 @@
 package main
 
 import (
-	//"database/sql"
-	//"encoding/base64"
 	"fmt"
 	"os"
-	"strings"
-
+	
 	class "github.com/matehaxor03/holistic_db_client/class"
 )
 
@@ -125,18 +122,10 @@ func runScript(client *class.Client, data_migration_record *class.Record, versio
 	}
 	
 	raw_sql_command_string := string(raw_sql_command)
-	_, stderr, sql_errors := SQLCommand.ExecuteUnsafeCommand(client, &raw_sql_command_string, class.Map{"use_file":true, "transactional":true})
+	_, sql_errors := SQLCommand.ExecuteUnsafeCommand(client, &raw_sql_command_string, class.Map{"use_file":true, "transactional":true})
 	
 	if sql_errors != nil {
 		errors = append(errors, sql_errors...)
-	}
-
-	if stderr != nil && *stderr != "" {
-		if strings.Contains(*stderr, " table exists") {
-			errors = append(errors, fmt.Errorf("create table failed most likely the table already exists"))
-		} else {
-			errors = append(errors, fmt.Errorf(*stderr))
-		}
 	}
 
 	if len(errors) > 0 {
