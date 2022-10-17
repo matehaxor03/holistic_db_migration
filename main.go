@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	
+
 	class "github.com/matehaxor03/holistic_db_client/class"
 )
 
@@ -93,6 +93,8 @@ func migrateDatabase() []error {
 			downgrade_errors := runScript(client, &data_migration_record, current, "upgrade")
 			if downgrade_errors != nil {
 				return downgrade_errors
+			} else {
+				fmt.Printf("database upgraded from current: %d desired: %d\n", current, desired)
 			}
 		}
 	} else if current > desired {
@@ -102,6 +104,8 @@ func migrateDatabase() []error {
 			downgrade_errors := runScript(client, &data_migration_record, current, "downgrade")
 			if downgrade_errors != nil {
 				return downgrade_errors
+			} else {
+				fmt.Printf("database downgraded from current: %d desired: %d\n", current, desired)
 			}
 		}
 	} else {
