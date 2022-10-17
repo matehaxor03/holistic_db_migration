@@ -59,15 +59,13 @@ func migrateDatabase() []error {
 		return errors
 	}
 
-
 	data_migration_records, record_errors := database_migration_table.Select(nil, nil, nil)
 	if record_errors != nil {
 		return record_errors
 	}
 
 	data_migration_record := (*data_migration_records)[0]
-	
-	
+
 	current_pt, current_errors := data_migration_record.GetInt64("current")
 	desired_pt, desired_errors := data_migration_record.GetInt64("desired")
 
@@ -98,7 +96,7 @@ func migrateDatabase() []error {
 			}
 		}
 	} else if current > desired {
-		for current > desired {	
+		for current > desired {
 			fmt.Printf("database downgrading from current: %d desired: %d\n", current, desired)
 			current = current - 1
 			downgrade_errors := runScript(client, &data_migration_record, current, "downgrade")
@@ -118,16 +116,16 @@ func migrateDatabase() []error {
 func runScript(client *class.Client, data_migration_record *class.Record, version int64, mode string) []error {
 	SQLCommand := class.NewSQLCommand()
 	var errors []error
-	filname := fmt.Sprintf("./scripts/sql/%d-%s.sql", version, mode)
-	raw_sql_command, read_file_error := os.ReadFile(filname) 
+	filename := fmt.Sprintf("./scripts/sql/%d-%s.sql", version, mode)
+	raw_sql_command, read_file_error := os.ReadFile(filename)
 	if read_file_error != nil {
 		errors = append(errors, read_file_error)
 		return errors
 	}
-	
+
 	raw_sql_command_string := string(raw_sql_command)
-	_, sql_errors := SQLCommand.ExecuteUnsafeCommand(client, &raw_sql_command_string, class.Map{"use_file":true, "transactional":true})
-	
+	_, sql_errors := SQLCommand.ExecuteUnsafeCommand(client, &raw_sql_command_string, class.Map{"use_file": true, "transactional": true})
+
 	if sql_errors != nil {
 		errors = append(errors, sql_errors...)
 	}
