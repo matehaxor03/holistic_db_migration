@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
-
 	class "github.com/matehaxor03/holistic_db_client/class"
+	json "github.com/matehaxor03/holistic_json/json"
+
 )
 
 func main() {
@@ -19,29 +20,24 @@ func main() {
 func migrateDatabase() []error {
 	var errors []error
 
-	db_hostname, db_port_number, db_name, migration_db_username, _, migration_details_errors := class.GetCredentialDetails("holistic_migration")
-	if migration_details_errors != nil {
-		errors = append(errors, migration_details_errors...)
+	client_manager, client_manager_errors := class.NewClientManager()
+	if client_manager_errors != nil {
+		return client_manager_errors
 	}
 
-	host, host_errors := class.NewHost(&db_hostname, &db_port_number)
-	client, client_errors := class.NewClient(host, &migration_db_username, nil)
-
-	if host_errors != nil {
-		errors = append(errors, host_errors...)
+	migration_database_connection_string := "holistic_db_config:127.0.0.1:3306:holistic:holistic_migration"
+	database_client, database_client_errors := client_manager.GetClient(migration_database_connection_string)
+	if database_client_errors != nil {
+		return database_client_errors
 	}
-
-	if client_errors != nil {
-		errors = append(errors, client_errors...)
+	
+	database, database_errors := database_client.GetDatabase()
+	if database_errors != nil {
+		return database_errors
 	}
 
 	if len(errors) > 0 {
 		return errors
-	}
-
-	database, use_database_errors := client.UseDatabaseByName(db_name)
-	if use_database_errors != nil {
-		return use_database_errors
 	}
 
 	database_migration_table, table_errors := database.GetTable("DatabaseMigration")
@@ -59,7 +55,7 @@ func migrateDatabase() []error {
 		return errors
 	}
 
-	data_migration_records, record_errors := database_migration_table.Select(nil, nil, nil)
+	data_migration_records, record_errors := database_migration_table.ReadRecords(nil, nil, nil, nil)
 	if record_errors != nil {
 		return record_errors
 	}
@@ -88,7 +84,7 @@ func migrateDatabase() []error {
 		for current < desired {
 			fmt.Printf("database upgrading from current: %d desired: %d\n", current, desired)
 			current = current + 1
-			downgrade_errors := runScript(client, &data_migration_record, current, "upgrade")
+			downgrade_errors := runScript(database, &data_migration_record, current, "upgrade")
 			if downgrade_errors != nil {
 				return downgrade_errors
 			} else {
@@ -99,7 +95,7 @@ func migrateDatabase() []error {
 		for current > desired {
 			fmt.Printf("database downgrading from current: %d desired: %d\n", current, desired)
 			current = current - 1
-			downgrade_errors := runScript(client, &data_migration_record, current, "downgrade")
+			downgrade_errors := runScript(database, &data_migration_record, current, "downgrade")
 			if downgrade_errors != nil {
 				return downgrade_errors
 			} else {
@@ -113,8 +109,7 @@ func migrateDatabase() []error {
 	return nil
 }
 
-func runScript(client *class.Client, data_migration_record *class.Record, version int64, mode string) []error {
-	SQLCommand := class.NewSQLCommand()
+func runScript(database *class.Database, data_migration_record *class.Record, version int64, mode string) []error {
 	var errors []error
 	filename := fmt.Sprintf("./scripts/sql/%d-%s.sql", version, mode)
 	raw_sql_command, read_file_error := os.ReadFile(filename)
@@ -124,7 +119,7 @@ func runScript(client *class.Client, data_migration_record *class.Record, versio
 	}
 
 	raw_sql_command_string := string(raw_sql_command)
-	_, sql_errors := SQLCommand.ExecuteUnsafeCommand(client, &raw_sql_command_string, class.Map{"use_file": true, "transactional": true})
+	_, sql_errors := database.ExecuteUnsafeCommand(&raw_sql_command_string, json.Map{"use_file": true, "transactional": true})
 
 	if sql_errors != nil {
 		errors = append(errors, sql_errors...)
