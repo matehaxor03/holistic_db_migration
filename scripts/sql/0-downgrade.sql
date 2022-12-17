@@ -1,6 +1,7 @@
+DROP TABLE IF EXISTS BuildBranchInstance;
 DROP TABLE IF EXISTS BuildBranch;
-DROP TABLE IF EXISTS DomainName;
 DROP TABLE IF EXISTS RepositoryAccount;
 DROP TABLE IF EXISTS Repository;
 DROP TABLE IF EXISTS Branch;
 DROP TABLE IF EXISTS ProgrammingLanguage;
+DROP TABLE IF EXISTS DomainName;
