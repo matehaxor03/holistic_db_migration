@@ -80,7 +80,21 @@ func migrateDatabase() []error {
 	current := *current_pt
 	desired := *desired_pt
 
-	if current < desired {
+	if desired == -1 && current == 0 {
+		fmt.Printf("database downgrading from current: %d desired: %d\n", current, desired)
+			downgrade_errors := runScript(database, &data_migration_record, current, "downgrade")
+			if downgrade_errors != nil {
+				return downgrade_errors
+			} else {
+				fmt.Printf("database downgraded from current: %d desired: %d\n", current, desired)
+			}
+			
+			data_migration_record.SetInt64("current", &desired)
+			update_errors := data_migration_record.Update()
+			if update_errors != nil {
+				return update_errors
+			}
+	} else if current < desired {
 		for current < desired {
 			fmt.Printf("database upgrading from current: %d desired: %d\n", current, desired)
 			current = current + 1
