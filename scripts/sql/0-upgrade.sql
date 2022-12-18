@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStep` (
 CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStepLog` (
     `build_branch_instance_step_log_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
     `build_branch_instance_step_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildBranchInstanceStep","column_name":"build_branch_instance_step_id","type":"uint64"}}',
-    `log` VARCHAR(512) NOT NULL DEFAULT '',
+    `log` VARCHAR(1024) NOT NULL DEFAULT '',
     `name` VARCHAR(1) NOT NULL DEFAULT '',
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 
