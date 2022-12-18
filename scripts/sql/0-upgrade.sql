@@ -181,23 +181,28 @@ SET @BuildBranchInstance_Statement := CONCAT('CREATE TABLE IF NOT EXISTS `BuildB
     FOREIGN KEY(`build_branch_id`) REFERENCES `BuildBranch`(`build_branch_id`),
     FOREIGN KEY(`build_step_id`) REFERENCES `BuildStep`(`build_step_id`));');
 
-PREPARE dynamic_statement FROM @BuildBranchInstance_Statement;
-EXECUTE dynamic_statement;
+PREPARE dynamic_BuildBranchInstance FROM @BuildBranchInstance_Statement;
+EXECUTE dynamic_BuildBranchInstance;
 
-CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStep` (
+SET @default_build_step_status_id = (SELECT build_step_status_id FROM BuildStepStatus WHERE `name` = 'not started' LIMIT 1);
+
+SET @BuildBranchInstanceStep_Statement := CONCAT('CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStep` (
     `build_branch_instance_step_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-    `build_branch_instance_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildBranchInstance","column_name":"build_branch_instance_id","type":"uint64"}}',
-    `build_step_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildStep,"column_name":"build_step_id","type":"uint64"}}',
-    `build_step_status_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildStepStatus","column_name":"build_step_status_id","type":"uint64"}}',
-    `name` VARCHAR(1) NOT NULL DEFAULT '',
+    `build_branch_instance_id` BIGINT UNSIGNED NOT NULL comment \'{"foreign_key":{"table_name":"BuildBranchInstance","column_name":"build_branch_instance_id","type":"uint64"}}\',
+    `build_step_id` BIGINT UNSIGNED NOT NULL comment \'{"foreign_key":{"table_name":"BuildStep,"column_name":"build_step_id","type":"uint64"}}\',
+    `build_step_status_id` BIGINT UNSIGNED NOT NULL DEFAULT ', @default_build_step_status_id, ' comment \'{"foreign_key":{"table_name":"BuildStepStatus","column_name":"build_step_status_id","type":"uint64"}}\',
+    `name` VARCHAR(1) NOT NULL DEFAULT \'\',
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
+    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT \'0000-00-00 00:00:00.000000\',
     FOREIGN KEY(`build_branch_instance_id`) REFERENCES `BuildBranchInstance`(`build_branch_instance_id`),
     FOREIGN KEY(`build_step_id`) REFERENCES `BuildStep`(`build_step_id`),
-    FOREIGN KEY(`build_step_status_id`) REFERENCES `BuildStepStatus`(`build_step_status_id`));
+    FOREIGN KEY(`build_step_status_id`) REFERENCES `BuildStepStatus`(`build_step_status_id`));');
+
+PREPARE dynamic_BuildBranchInstanceStep FROM @BuildBranchInstanceStep_Statement;
+EXECUTE dynamic_BuildBranchInstanceStep;
 
 CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStepLog` (
     `build_branch_instance_step_log_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
