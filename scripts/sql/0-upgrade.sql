@@ -21,8 +21,22 @@ CREATE TABLE IF NOT EXISTS `BuildStep` (
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
      CONSTRAINT UC_BuildStep_name UNIQUE (`name`));
 
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('lint', 0);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('unit tests', 100);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure source folder exists', -10000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure repsitory account folder exists', -9000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure repsitory folder exists', -8000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure clone latest branch or tag folder', -7000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure pull latest for branch or tag folder', -6000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure copy branch or tag folder to branch or tag instance folder', -5000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure user exists branch or tag instance folder', -4000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure user has permission to read, write and execute only for branch or tag instance folder', -3000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> ensure pull latest for branch or tag instance folder', -2000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> clean', 0);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> lint', 100);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> build', 200);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> unit tests', 300);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> delete branch or tag instance folder', 10000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> delete user for branch or tag instance folder', 11000);
+
 
 CREATE TABLE IF NOT EXISTS `BuildStepStatus` (
     `build_step_status_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
