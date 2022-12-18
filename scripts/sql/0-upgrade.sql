@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `BuildStep` (
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure source folder exists', -10000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure repsitory account folder exists', -9000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure repsitory folder exists', -8000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure ensure branches or tags folder exists', -8000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure clone latest branch or tag folder', -7000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure pull latest for branch or tag folder', -6000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure copy branch or tag folder to branch or tag instance folder', -5000);
@@ -36,7 +37,7 @@ INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> build', 200);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> unit tests', 300);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> delete branch or tag instance folder', 10000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> delete user for branch or tag instance folder', 11000);
-
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> delete user for branch or tag instance folder from db', 12000);
 
 CREATE TABLE IF NOT EXISTS `BuildStepStatus` (
     `build_step_status_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
