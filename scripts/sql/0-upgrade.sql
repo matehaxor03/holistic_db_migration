@@ -21,23 +21,27 @@ CREATE TABLE IF NOT EXISTS `BuildStep` (
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
      CONSTRAINT UC_BuildStep_name UNIQUE (`name`));
 
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure branch or tag instance steps exist', -11000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure source folder exists', -10000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure repsitory account folder exists', -9000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure repsitory folder exists', -8000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure ensure branches or tags folder exists', -8000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure clone latest branch or tag folder', -7000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure pull latest for branch or tag folder', -6000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure copy branch or tag folder to branch or tag instance folder', -5000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure user exists branch or tag instance folder', -4000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure user has permission to read, write and execute only for branch or tag instance folder', -3000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user - ensure pull latest for branch or tag instance folder', -2000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - start', -13000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure source folder exists', -12000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure repsitory account folder exists', -11000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure repsitory folder exists', -10000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure ensure branches or tags folder exists', -9000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure clone latest branch or tag folder', -8000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure pull latest for branch or tag folder', -7000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure copy branch or tag folder to branch or tag instance folder', -6000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure user exists branch or tag instance folder', -5000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure user group exists for branch or tag instance folder', -4000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure assign group to user for branch or tag instance folder', -3000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - ensure assign group to branch or tag instance folder', -2000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user - ensure pull latest for branch or tag instance folder', -1000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user - clean', 0);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user - lint', 100);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user - build', 200);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user - unit tests', 300);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user - delete branch or tag instance folder', 10000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - delete user for branch or tag instance folder', 11000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor - end', 12000);
+
 
 CREATE TABLE IF NOT EXISTS `BuildStepStatus` (
     `build_step_status_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -166,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranch` (
     FOREIGN KEY(`branch_id`) REFERENCES `Branch`(`branch_id`),
     CONSTRAINT UC_BuildBranch_id UNIQUE (`build_id`,`branch_id`));
 
-SET @default_build_step_id = (SELECT build_step_id FROM BuildStep WHERE `name` = 'processor - ensure branch or tag instance steps exist' LIMIT 1);
+SET @default_build_step_id = (SELECT build_step_id FROM BuildStep WHERE `name` = 'processor - start' LIMIT 1);
 
 SET @BuildBranchInstance_Statement := CONCAT('CREATE TABLE IF NOT EXISTS `BuildBranchInstance` (
     `build_branch_instance_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
