@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `BuildStep` (
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
      CONSTRAINT UC_BuildStep_name UNIQUE (`name`));
 
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure branch or tag instance steps exist', -11000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure source folder exists', -10000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure repsitory account folder exists', -9000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> ensure repsitory folder exists', -8000);
@@ -37,7 +38,6 @@ INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> build', 200);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> unit tests', 300);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('user-> delete branch or tag instance folder', 10000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> delete user for branch or tag instance folder', 11000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('processor-> delete user for branch or tag instance folder from db', 12000);
 
 CREATE TABLE IF NOT EXISTS `BuildStepStatus` (
     `build_step_status_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -68,23 +68,6 @@ CREATE TABLE IF NOT EXISTS `ProgrammingLanguage` (
     CONSTRAINT UC_ProgrammingLanguage_name UNIQUE (`name`));
 
 INSERT INTO `ProgrammingLanguage` (`name`) VALUES ('Go');
-
-CREATE TABLE IF NOT EXISTS `BuildStepProgrammingLanguage` (
-    `build_step_programming_language_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-    `programming_language_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"ProgrammingLanguage","column_name":"programming_language_id","type":"uint64"}}', 
-    `build_step_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildStep","column_name":"build_step_id","type":"uint64"}}', 
-    `name` VARCHAR(255) NOT NULL DEFAULT '',
-    `active` BOOLEAN DEFAULT 1, 
-    `archieved` BOOLEAN DEFAULT 0, 
-    `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-    FOREIGN KEY(`programming_language_id`) REFERENCES `ProgrammingLanguage`(`programming_language_id`), 
-    FOREIGN KEY(`build_step_id`) REFERENCES `BuildStep`(`build_step_id`),     
-    CONSTRAINT UC_BuildStepProgrammingLanguage_id UNIQUE (`programming_language_id`,`build_step_id`));
-
-INSERT INTO `BuildStepProgrammingLanguage` (`programming_language_id`,`build_step_id`) VALUES ((SELECT `ProgrammingLanguage`.`programming_language_id` FROM `ProgrammingLanguage` WHERE `ProgrammingLanguage`.`name` = 'Go' LIMIT 1), (SELECT `BuildStep`.`build_step_id` FROM `BuildStep` WHERE `BuildStep`.`name` = 'lint' LIMIT 1));
-INSERT INTO `BuildStepProgrammingLanguage` (`programming_language_id`,`build_step_id`) VALUES ((SELECT `ProgrammingLanguage`.`programming_language_id` FROM `ProgrammingLanguage` WHERE `ProgrammingLanguage`.`name` = 'Go' LIMIT 1), (SELECT `BuildStep`.`build_step_id` FROM `BuildStep` WHERE `BuildStep`.`name` = 'unit tests' LIMIT 1));
 
 CREATE TABLE IF NOT EXISTS `RepositoryAccount` (
     `repository_account_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -198,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranchInstance` (
 CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStep` (
     `build_branch_instance_step_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
     `build_branch_instance_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildBranchInstance","column_name":"build_branch_instance_id","type":"uint64"}}',
-    `build_step_programming_language_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildStepProgrammingLanguage","column_name":"build_step_programming_language_id","type":"uint64"}}',
+    `build_step_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildStep,"column_name":"build_step_id","type":"uint64"}}',
     `build_step_status_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildStepStatus","column_name":"build_step_status_id","type":"uint64"}}',
     `name` VARCHAR(1) NOT NULL DEFAULT '',
     `active` BOOLEAN DEFAULT 1, 
@@ -207,7 +190,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStep` (
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
     FOREIGN KEY(`build_branch_instance_id`) REFERENCES `BuildBranchInstance`(`build_branch_instance_id`),
-    FOREIGN KEY(`build_step_programming_language_id`) REFERENCES `BuildStepProgrammingLanguage`(`build_step_programming_language_id`),
+    FOREIGN KEY(`build_step_id`) REFERENCES `BuildStep`(`build_step_id`),
     FOREIGN KEY(`build_step_status_id`) REFERENCES `BuildStepStatus`(`build_step_status_id`));
 
 CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStepLog` (
