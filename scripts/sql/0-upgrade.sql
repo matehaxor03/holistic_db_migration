@@ -44,6 +44,7 @@ INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Clean', 0);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Lint', 1000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Build', 2000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_UnitTests', 3000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_IntegrationTests', 4000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_RemoveGroupFromInstanceFolder', 11000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_RemoveGroupFromUser', 12000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_DeleteGroup', 13000);
