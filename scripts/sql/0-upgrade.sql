@@ -21,23 +21,25 @@ CREATE TABLE IF NOT EXISTS `BuildStep` (
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
      CONSTRAINT UC_BuildStep_name UNIQUE (`name`));
 
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_NotStarted', -18000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Start', -17000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateSourceFolder', -16000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateDomainNameFolder', -15000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateRepositoryAccountFolder', -14000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateRepositoryFolder', -13000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchesFolder', -12000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateTagsFolder', -11000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_NotStarted', -20000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Start', -19000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateSourceFolder', -18000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateDomainNameFolder', -17000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateRepositoryAccountFolder', -16000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateRepositoryFolder', -15000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchesFolder', -14000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateTagsFolder', -13000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchInstancesFolder', -12000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateTagInstancesFolder', -11000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchOrTagFolder', -10000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CloneBranchOrTagFolder', -9000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_PullLatestBranchOrTagFolder', -7000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_PullLatestBranchOrTagFolder', -8000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateInstanceFolder', -7000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CopyToInstanceFolder', -6000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateGroup', -5000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateUser', -4000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_AssignGroupToUser', -3000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_AssignGroupToInstanceFolder', -2000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_PullLatestInstanceFolder', -1000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Clean', 0);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Lint', 1000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Build', 2000);
