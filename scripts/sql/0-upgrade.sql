@@ -152,7 +152,8 @@ CREATE TABLE IF NOT EXISTS `TestSuiteBuildBranch` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000', 
-    FOREIGN KEY(`build_branch_id`) REFERENCES `BuildBranch`(`build_branch_id`));
+    FOREIGN KEY(`build_branch_id`) REFERENCES `BuildBranch`(`build_branch_id`),
+    CONSTRAINT UC_TestSuiteBuildBranch_id UNIQUE (`build_branch_id`,`name`));
 
 CREATE TABLE IF NOT EXISTS `TestBuildBranch` (
     `test_build_branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -163,7 +164,8 @@ CREATE TABLE IF NOT EXISTS `TestBuildBranch` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000', 
-    FOREIGN KEY(`test_suite_build_branch_id`) REFERENCES `TestSuiteBuildBranch`(`test_suite_build_branch_id`));
+    FOREIGN KEY(`test_suite_build_branch_id`) REFERENCES `TestSuiteBuildBranch`(`test_suite_build_branch_id`),
+    CONSTRAINT UC_TestBuildBranch_id UNIQUE (`test_suite_build_branch_id`,`name`));
 
 CREATE TABLE IF NOT EXISTS `TestResult` (
     `test_result_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -221,6 +223,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStepLog` (
     `build_branch_instance_step_log_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
     `build_branch_instance_step_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildBranchInstanceStep","column_name":"build_branch_instance_step_id","type":"uint64"}}',
     `log` VARCHAR(1024) NOT NULL DEFAULT '',
+    `stdout` BOOLEAN DEFAULT 1, 
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
@@ -233,6 +236,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStepTestResult` (
     `build_branch_instance_step_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BuildBranchInstanceStep","column_name":"build_branch_instance_step_id","type":"uint64"}}',
     `test_build_branch_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"TestBuildBranch","column_name":"test_build_branch_id","type":"uint64"}}',
     `test_result_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"TestResult","column_name":"test_result_id","type":"uint64"}}',
+    `duration` DOUBLE NOT NULL DEFAULT -1.00, 
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 

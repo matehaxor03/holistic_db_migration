@@ -25,7 +25,7 @@ func migrateDatabase() []error {
 		return client_manager_errors
 	}
 
-	migration_database_connection_string := "holistic_db_config:127.0.0.1:3306:holistic:holistic_migration"
+	migration_database_connection_string := "holistic_db_config#127.0.0.1#3306#holistic#holistic_migration"
 	database_client, database_client_errors := client_manager.GetClient(migration_database_connection_string)
 	if database_client_errors != nil {
 		return database_client_errors
@@ -55,7 +55,7 @@ func migrateDatabase() []error {
 		return errors
 	}
 
-	data_migration_records, record_errors := database_migration_table.ReadRecords(nil, nil, nil, nil)
+	data_migration_records, record_errors := database_migration_table.ReadRecords(nil, nil, nil, nil, nil, nil)
 	if record_errors != nil {
 		return record_errors
 	}
