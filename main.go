@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	class "github.com/matehaxor03/holistic_db_client/class"
+	db_client "github.com/matehaxor03/holistic_db_client/db_client"
 	json "github.com/matehaxor03/holistic_json/json"
-
 )
 
 func main() {
@@ -20,7 +19,7 @@ func main() {
 func migrateDatabase() []error {
 	var errors []error
 
-	client_manager, client_manager_errors := class.NewClientManager()
+	client_manager, client_manager_errors := db_client.NewClientManager()
 	if client_manager_errors != nil {
 		return client_manager_errors
 	}
@@ -45,7 +44,7 @@ func migrateDatabase() []error {
 		return table_errors
 	}
 
-	count, count_errors := database_migration_table.Count()
+	count, count_errors := database_migration_table.Count(nil, nil, nil, nil, nil)
 	if count_errors != nil {
 		return count_errors
 	}
@@ -123,7 +122,7 @@ func migrateDatabase() []error {
 	return nil
 }
 
-func runScript(database *class.Database, data_migration_record *class.Record, version int64, mode string) []error {
+func runScript(database *db_client.Database, data_migration_record *db_client.Record, version int64, mode string) []error {
 	var errors []error
 	filename := fmt.Sprintf("./scripts/sql/%d-%s.sql", version, mode)
 	raw_sql_command, read_file_error := os.ReadFile(filename)
@@ -133,7 +132,10 @@ func runScript(database *class.Database, data_migration_record *class.Record, ve
 	}
 
 	raw_sql_command_string := string(raw_sql_command)
-	_, sql_errors := database.ExecuteUnsafeCommand(&raw_sql_command_string, json.Map{"use_file": true, "transactional": true})
+	options := json.NewMap()
+	options.SetBoolValue("use_file", true)
+	options.SetBoolValue("transactional", true)
+	_, sql_errors := database.ExecuteUnsafeCommand(&raw_sql_command_string, options)
 
 	if sql_errors != nil {
 		errors = append(errors, sql_errors...)

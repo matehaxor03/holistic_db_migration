@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `DomainName` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-     CONSTRAINT UC_DomainName_name UNIQUE (`name`));
+     CONSTRAINT `name` UNIQUE (`name`));
 
 INSERT INTO `DomainName` (`name`) VALUES ('github.com');
 
@@ -19,21 +19,22 @@ CREATE TABLE IF NOT EXISTS `BuildStep` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-     CONSTRAINT UC_BuildStep_name UNIQUE (`name`));
+     CONSTRAINT `name,order` UNIQUE (`name`,`order`)) comment '{"cache":true}';
 
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_NotStarted', -20000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Start', -19000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateSourceFolder', -18000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateDomainNameFolder', -17000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateRepositoryAccountFolder', -16000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateRepositoryFolder', -15000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchesFolder', -14000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateTagsFolder', -13000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchInstancesFolder', -12000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateTagInstancesFolder', -11000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchOrTagFolder', -10000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CloneBranchOrTagFolder', -9000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_PullLatestBranchOrTagFolder', -8000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_NotStarted', -21000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Start', -20000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateSourceFolder', -19000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateDomainNameFolder', -18000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateRepositoryAccountFolder', -17000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateRepositoryFolder', -16000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchesFolder', -15000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateTagsFolder', -14000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchInstancesFolder', -13000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateTagInstancesFolder', -12000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateBranchOrTagFolder', -11000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CloneBranchOrTagFolder', -10000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_PullLatestBranchOrTagFolder', -9000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_DeleteInstanceFolder', -8000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateInstanceFolder', -7000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CopyToInstanceFolder', -6000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateGroup', -5000);
@@ -45,6 +46,8 @@ INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Lint', 1000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Build', 2000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_UnitTests', 3000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_IntegrationTests', 4000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_IntegrationTestSuite', 5000);
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Sync', 6000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_RemoveGroupFromInstanceFolder', 11000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_RemoveGroupFromUser', 12000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_DeleteGroup', 13000);
@@ -60,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `BuildStepStatus` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-     CONSTRAINT UC_BuildStepStatus_name UNIQUE (`name`));
+     CONSTRAINT `name` UNIQUE (`name`)) comment '{"cache":true}';
 
 INSERT INTO `BuildStepStatus` (`name`) VALUES ('Not Started');
 INSERT INTO `BuildStepStatus` (`name`) VALUES ('Running');
@@ -77,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `ProgrammingLanguage` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-    CONSTRAINT UC_ProgrammingLanguage_name UNIQUE (`name`));
+    CONSTRAINT `name` UNIQUE (`name`));
 
 INSERT INTO `ProgrammingLanguage` (`name`) VALUES ('Go');
 
@@ -89,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `RepositoryAccount` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-    CONSTRAINT UC_RepositoryAccount_name UNIQUE (`name`));
+    CONSTRAINT `name` UNIQUE (`name`));
 
 CREATE TABLE IF NOT EXISTS `Repository` (
     `repository_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -99,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `Repository` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-    CONSTRAINT UC_Repository_name UNIQUE (`name`));
+    CONSTRAINT `name` UNIQUE (`name`));
 
 CREATE TABLE IF NOT EXISTS `Branch` (
     `branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -109,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `Branch` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-    CONSTRAINT UC_Branch_name UNIQUE (`name`));
+    CONSTRAINT `name` UNIQUE (`name`));
 
 INSERT INTO `Branch` (`name`) VALUES ('main');
 INSERT INTO `Branch` (`name`) VALUES ('master');
@@ -127,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `Build` (
     FOREIGN KEY(`domain_name_id`) REFERENCES `DomainName`(`domain_name_id`),   
     FOREIGN KEY(`repository_account_id`) REFERENCES `RepositoryAccount`(`repository_account_id`),
     FOREIGN KEY(`repository_id`) REFERENCES `Repository`(`repository_id`),
-    CONSTRAINT UC_Build_id UNIQUE (`domain_name_id`,`repository_account_id`,`repository_id`));
+    CONSTRAINT `domain_name_id,repository_account_id,repository_account_id` UNIQUE (`domain_name_id`,`repository_account_id`,`repository_id`)) comment '{"cache":true}';
 
 CREATE TABLE IF NOT EXISTS `BuildBranch` (
     `build_branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -137,10 +140,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranch` (
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000', 
-    FOREIGN KEY(`build_id`) REFERENCES `Build`(`build_id`),
-    FOREIGN KEY(`branch_id`) REFERENCES `Branch`(`branch_id`),
-    CONSTRAINT UC_BuildBranch_id UNIQUE (`build_id`,`branch_id`));
+    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000');
 
 CREATE TABLE IF NOT EXISTS `TestSuiteBuildBranch` (
     `test_suite_build_branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -151,9 +151,7 @@ CREATE TABLE IF NOT EXISTS `TestSuiteBuildBranch` (
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000', 
-    FOREIGN KEY(`build_branch_id`) REFERENCES `BuildBranch`(`build_branch_id`),
-    CONSTRAINT UC_TestSuiteBuildBranch_id UNIQUE (`build_branch_id`,`name`));
+    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000');
 
 CREATE TABLE IF NOT EXISTS `TestBuildBranch` (
     `test_build_branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -163,9 +161,7 @@ CREATE TABLE IF NOT EXISTS `TestBuildBranch` (
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000', 
-    FOREIGN KEY(`test_suite_build_branch_id`) REFERENCES `TestSuiteBuildBranch`(`test_suite_build_branch_id`),
-    CONSTRAINT UC_TestBuildBranch_id UNIQUE (`test_suite_build_branch_id`,`name`));
+    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000');
 
 CREATE TABLE IF NOT EXISTS `TestResult` (
     `test_result_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -175,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `TestResult` (
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000', 
-    CONSTRAINT UC_TestResult_name UNIQUE (`name`));
+    CONSTRAINT `name` UNIQUE (`name`)) comment '{"cache":true}';
 
 INSERT INTO `TestResult` (`name`) VALUES ('Passed');
 INSERT INTO `TestResult` (`name`) VALUES ('Failed');
@@ -194,9 +190,7 @@ SET @BuildBranchInstance_Statement := CONCAT('CREATE TABLE IF NOT EXISTS `BuildB
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT \'0000-00-00 00:00:00.000000\',
-    FOREIGN KEY(`build_branch_id`) REFERENCES `BuildBranch`(`build_branch_id`),
-    FOREIGN KEY(`build_step_status_id`) REFERENCES `BuildStepStatus`(`build_step_status_id`));');
+    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT \'0000-00-00 00:00:00.000000\');');
 
 PREPARE dynamic_BuildBranchInstance FROM @BuildBranchInstance_Statement;
 EXECUTE dynamic_BuildBranchInstance;
@@ -207,14 +201,12 @@ SET @BuildBranchInstanceStep_Statement := CONCAT('CREATE TABLE IF NOT EXISTS `Bu
     `build_step_id` BIGINT UNSIGNED NOT NULL comment \'{"foreign_key":{"table_name":"BuildStep","column_name":"build_step_id","type":"uint64"}}\',
     `build_step_status_id` BIGINT UNSIGNED NOT NULL DEFAULT ', @default_build_step_status_id, ' comment \'{"foreign_key":{"table_name":"BuildStepStatus","column_name":"build_step_status_id","type":"uint64"}}\',
     `order` BIGINT NOT NULL DEFAULT -1, 
+    `parameters` VARCHAR(1024) NOT NULL DEFAULT \'{}\',
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT \'0000-00-00 00:00:00.000000\',
-    FOREIGN KEY(`build_branch_instance_id`) REFERENCES `BuildBranchInstance`(`build_branch_instance_id`),
-    FOREIGN KEY(`build_step_id`) REFERENCES `BuildStep`(`build_step_id`),
-    FOREIGN KEY(`build_step_status_id`) REFERENCES `BuildStepStatus`(`build_step_status_id`));');
+    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT \'0000-00-00 00:00:00.000000\');');
 
 PREPARE dynamic_BuildBranchInstanceStep FROM @BuildBranchInstanceStep_Statement;
 EXECUTE dynamic_BuildBranchInstanceStep;
@@ -228,8 +220,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStepLog` (
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-    FOREIGN KEY(`build_branch_instance_step_id`) REFERENCES `BuildBranchInstanceStep`(`build_branch_instance_step_id`));
+    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000');
 
 CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStepTestResult` (
     `build_branch_instance_step_test_result_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -241,10 +232,7 @@ CREATE TABLE IF NOT EXISTS `BuildBranchInstanceStepTestResult` (
     `archieved` BOOLEAN DEFAULT 0, 
     `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
-    FOREIGN KEY(`build_branch_instance_step_id`) REFERENCES `BuildBranchInstanceStep`(`build_branch_instance_step_id`),
-    FOREIGN KEY(`test_build_branch_id`) REFERENCES `TestBuildBranch`(`test_build_branch_id`),
-    FOREIGN KEY(`test_result_id`) REFERENCES `TestResult`(`test_result_id`));
+    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000');
 
 
 
