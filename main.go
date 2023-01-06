@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	db_client "github.com/matehaxor03/holistic_db_client/db_client"
+	dao "github.com/matehaxor03/holistic_db_client/dao"
 	json "github.com/matehaxor03/holistic_json/json"
 )
 
@@ -122,7 +123,7 @@ func migrateDatabase() []error {
 	return nil
 }
 
-func runScript(database *db_client.Database, data_migration_record *db_client.Record, version int64, mode string) []error {
+func runScript(database *dao.Database, data_migration_record *dao.Record, version int64, mode string) []error {
 	var errors []error
 	filename := fmt.Sprintf("./scripts/sql/%d-%s.sql", version, mode)
 	raw_sql_command, read_file_error := os.ReadFile(filename)
