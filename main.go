@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	db_client "github.com/matehaxor03/holistic_db_client/db_client"
 	dao "github.com/matehaxor03/holistic_db_client/dao"
-	json "github.com/matehaxor03/holistic_json/json"
+	common "github.com/matehaxor03/holistic_common/common"
 )
 
 func main() {
@@ -20,22 +19,18 @@ func main() {
 func migrateDatabase() []error {
 	var errors []error
 
-	client_manager, client_manager_errors := db_client.NewClientManager()
+	client_manager, client_manager_errors := dao.NewClientManager()
 	if client_manager_errors != nil {
 		return client_manager_errors
 	}
 
-	migration_database_connection_string := "holistic_db_config#127.0.0.1#3306#holistic#holistic_migration"
-	database_client, database_client_errors := client_manager.GetClient(migration_database_connection_string)
+	database_client, database_client_errors := client_manager.GetClient("127.0.0.1", "3306", "holistic", "holistic_migration")
 	if database_client_errors != nil {
 		return database_client_errors
 	}
 	
-	database, database_errors := database_client.GetDatabase()
-	if database_errors != nil {
-		return database_errors
-	}
-
+	database := database_client.GetDatabase()
+	
 	if len(errors) > 0 {
 		return errors
 	}
@@ -124,19 +119,31 @@ func migrateDatabase() []error {
 }
 
 func runScript(database *dao.Database, data_migration_record *dao.Record, version int64, mode string) []error {
+	bashCommand := common.NewBashCommand()
+	directory_parts := common.GetDataDirectory()
+	directory := "/" 
+	for index, directory_part := range directory_parts {
+		directory += directory_part
+		if index < len(directory_parts) - 1 {
+			directory += "/"
+		}
+	}
+	
 	var errors []error
 	filename := fmt.Sprintf("./scripts/sql/%d-%s.sql", version, mode)
-	raw_sql_command, read_file_error := os.ReadFile(filename)
+	_, read_file_error := os.ReadFile(filename)
 	if read_file_error != nil {
 		errors = append(errors, read_file_error)
 		return errors
 	}
 
-	raw_sql_command_string := string(raw_sql_command)
-	options := json.NewMap()
-	options.SetBoolValue("use_file", true)
-	options.SetBoolValue("transactional", true)
-	_, sql_errors := database.ExecuteUnsafeCommand(&raw_sql_command_string, options)
+	host := database.GetHost()
+	host_name := host.GetHostName()
+	port_number := host.GetPortNumber()
+	database_name := database.GetDatabaseName()
+	database_username := database.GetDatabaseUsername()
+	
+	_, sql_errors := bashCommand.ExecuteUnsafeCommand("/usr/local/mysql/bin/mysql --defaults-extra-file=" + directory + "/holistic_db_config#" + host_name + "#" + port_number + "#" + database_name + "#" + (*database_username) + ".config --host=" + host_name + " --port=" + port_number + " --protocol=TCP --wait --reconnect --batch", nil, nil)
 
 	if sql_errors != nil {
 		errors = append(errors, sql_errors...)
