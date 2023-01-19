@@ -1,3 +1,4 @@
+USE `holistic`;
 DROP TABLE IF EXISTS `BuildBranchInstanceStepTestResult`;
 DROP TABLE IF EXISTS `BuildBranchInstanceStepLog`;
 DROP TABLE IF EXISTS `BuildBranchInstanceStep`;

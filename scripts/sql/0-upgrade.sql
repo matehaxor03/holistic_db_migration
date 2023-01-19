@@ -1,3 +1,4 @@
+USE `holistic`;
 CREATE TABLE IF NOT EXISTS `DomainName` (
     `domain_name_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
     `name` VARCHAR(255) NOT NULL DEFAULT '' comment '{"rules":["domain_name"]}', 
@@ -21,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `BuildStep` (
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
      CONSTRAINT `name,order` UNIQUE (`name`,`order`)) comment '{"cache":true}';
 
+INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Sync', -100000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_NotStarted', -21000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Start', -20000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_CreateSourceFolder', -19000);
@@ -47,7 +49,6 @@ INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Build', 2000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_UnitTests', 3000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_IntegrationTests', 4000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_IntegrationTestSuite', 5000);
-INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_Sync', 6000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_RemoveGroupFromInstanceFolder', 11000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_RemoveGroupFromUser', 12000);
 INSERT INTO `BuildStep` (`name`,`order`) VALUES ('Run_DeleteGroup', 13000);

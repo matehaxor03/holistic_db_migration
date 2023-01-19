@@ -24,7 +24,7 @@ func migrateDatabase() []error {
 		return client_manager_errors
 	}
 
-	database_client, database_client_errors := client_manager.GetClient("127.0.0.1", "3306", "holistic", "holistic_migration")
+	database_client, database_client_errors := client_manager.GetClient("127.0.0.1", "3306", "holistic", "holistic_mig")
 	if database_client_errors != nil {
 		return database_client_errors
 	}
@@ -143,7 +143,7 @@ func runScript(database *dao.Database, data_migration_record *dao.Record, versio
 	database_name := database.GetDatabaseName()
 	database_username := database.GetDatabaseUsername()
 	
-	_, sql_errors := bashCommand.ExecuteUnsafeCommand("/usr/local/mysql/bin/mysql --defaults-extra-file=" + directory + "/holistic_db_config#" + host_name + "#" + port_number + "#" + database_name + "#" + (*database_username) + ".config --host=" + host_name + " --port=" + port_number + " --protocol=TCP --wait --reconnect --batch", nil, nil)
+	_, sql_errors := bashCommand.ExecuteUnsafeCommand("/usr/local/mysql/bin/mysql --defaults-extra-file=" + directory + "/holistic_db_config#" + host_name + "#" + port_number + "#" + database_name + "#" + (*database_username) + ".config --host=" + host_name + " --port=" + port_number + " --protocol=TCP --wait --reconnect --batch < " + filename , nil, nil)
 
 	if sql_errors != nil {
 		errors = append(errors, sql_errors...)
