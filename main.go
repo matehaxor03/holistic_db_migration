@@ -143,7 +143,7 @@ func runScript(database *dao.Database, data_migration_record *dao.Record, versio
 	database_name := database.GetDatabaseName()
 	database_username := database.GetDatabaseUsername()
 	
-	_, sql_errors := bashCommand.ExecuteUnsafeCommand("/usr/local/mysql/bin/mysql --defaults-extra-file=" + directory + "/holistic_db_config#" + host_name + "#" + port_number + "#" + database_name + "#" + (*database_username) + ".config --host=" + host_name + " --port=" + port_number + " --protocol=TCP --wait --reconnect --batch < " + filename , nil, nil)
+	_, sql_errors := bashCommand.ExecuteUnsafeCommandUsingFilesWithoutInputFile("/usr/local/mysql/bin/mysql --defaults-extra-file=" + directory + "/holistic_db_config#" + host_name + "#" + port_number + "#" + database_name + "#" + (*database_username) + ".config --host=" + host_name + " --port=" + port_number + " --protocol=TCP --wait --reconnect --batch < " + filename)
 
 	if sql_errors != nil {
 		errors = append(errors, sql_errors...)

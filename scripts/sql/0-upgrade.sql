@@ -87,6 +87,7 @@ INSERT INTO `ProgrammingLanguage` (`name`) VALUES ('Go');
 
 CREATE TABLE IF NOT EXISTS `RepositoryAccount` (
     `repository_account_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+    `domain_name_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"DomainName","column_name":"domain_name_id","type":"uint64"}}', 
     `name` VARCHAR(255) NOT NULL DEFAULT '' comment '{"rules":["repository_account_name"]}', 
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 
@@ -97,6 +98,7 @@ CREATE TABLE IF NOT EXISTS `RepositoryAccount` (
 
 CREATE TABLE IF NOT EXISTS `Repository` (
     `repository_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+    `repository_account_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"RepositoryAccount","column_name":"repository_account_id","type":"uint64"}}',
     `name` VARCHAR(255) NOT NULL DEFAULT '' comment '{"rules":["repository_name"]}', 
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 
