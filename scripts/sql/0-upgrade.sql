@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS `Repository` (
 
 CREATE TABLE IF NOT EXISTS `Branch` (
     `branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+    `repository_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"Repository","column_name":"repository_id","type":"uint64"}}',
     `name` VARCHAR(255) NOT NULL DEFAULT '' comment '{"rules":["branch_name"]}', 
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 
@@ -116,34 +117,6 @@ CREATE TABLE IF NOT EXISTS `Branch` (
     `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
     `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
     CONSTRAINT `name` UNIQUE (`name`));
-
-INSERT INTO `Branch` (`name`) VALUES ('main');
-INSERT INTO `Branch` (`name`) VALUES ('master');
-
-CREATE TABLE IF NOT EXISTS `Build` (
-    `build_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-    `domain_name_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"DomainName","column_name":"domain_name_id","type":"uint64"}}', 
-    `repository_account_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"RepositoryAccount","column_name":"repository_account_id","type":"uint64"}}',
-    `repository_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"Repository","column_name":"repository_id","type":"uint64"}}',
-    `active` BOOLEAN DEFAULT 1, 
-    `archieved` BOOLEAN DEFAULT 0, 
-    `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000', 
-    FOREIGN KEY(`domain_name_id`) REFERENCES `DomainName`(`domain_name_id`),   
-    FOREIGN KEY(`repository_account_id`) REFERENCES `RepositoryAccount`(`repository_account_id`),
-    FOREIGN KEY(`repository_id`) REFERENCES `Repository`(`repository_id`),
-    CONSTRAINT `domain_name_id,repository_account_id,repository_account_id` UNIQUE (`domain_name_id`,`repository_account_id`,`repository_id`)) comment '{"cache":true}';
-
-CREATE TABLE IF NOT EXISTS `BuildBranch` (
-    `build_branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-    `build_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"Build","column_name":"build_id","type":"uint64"}}', 
-    `branch_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"Branch","column_name":"branch_id","type":"uint64"}}', 
-    `active` BOOLEAN DEFAULT 1, 
-    `archieved` BOOLEAN DEFAULT 0, 
-    `created_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `last_modified_date` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), 
-    `archieved_date` TIMESTAMP(6) NOT NULL DEFAULT '0000-00-00 00:00:00.000000');
 
 CREATE TABLE IF NOT EXISTS `TestSuiteBuildBranch` (
     `test_suite_build_branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
@@ -187,7 +160,7 @@ SET @default_build_step_status_id = (SELECT build_step_status_id FROM BuildStepS
 
 SET @BuildBranchInstance_Statement := CONCAT('CREATE TABLE IF NOT EXISTS `BuildBranchInstance` (
     `build_branch_instance_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-    `build_branch_id` BIGINT UNSIGNED NOT NULL comment \'{"foreign_key":{"table_name":"BuildBranch","column_name":"build_branch_id","type":"uint64"}}\',
+    `branch_id` BIGINT UNSIGNED NOT NULL comment \'{"foreign_key":{"table_name":"Branch","column_name":"branch_id","type":"uint64"}}\',
     `build_step_status_id` BIGINT UNSIGNED NOT NULL DEFAULT ', @default_build_step_status_id, ' comment \'{"foreign_key":{"table_name":"BuildStepStatus","column_name":"build_step_status_id","type":"uint64"}}\',
     `active` BOOLEAN DEFAULT 1, 
     `archieved` BOOLEAN DEFAULT 0, 

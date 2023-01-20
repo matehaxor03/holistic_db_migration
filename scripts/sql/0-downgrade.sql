@@ -6,8 +6,6 @@ DROP TABLE IF EXISTS `BuildBranchInstance`;
 DROP TABLE IF EXISTS `TestBuildBranch`;
 DROP TABLE IF EXISTS `TestResult`;
 DROP TABLE IF EXISTS `TestSuiteBuildBranch`;
-DROP TABLE IF EXISTS `BuildBranch`;
-DROP TABLE IF EXISTS `Build`;
 DROP TABLE IF EXISTS `Branch`;
 DROP TABLE IF EXISTS `Repository`;
 DROP TABLE IF EXISTS `RepositoryAccount`;
