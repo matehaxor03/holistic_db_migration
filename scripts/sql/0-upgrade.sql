@@ -211,6 +211,7 @@ EXECUTE dynamic_BuildBranchInstanceStep;
 
 CREATE TABLE IF NOT EXISTS `BranchInstanceStepLog` (
     `branch_instance_step_log_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+    `branch_instance_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BranchInstance","column_name":"branch_instance_id","type":"uint64"}}',
     `branch_instance_step_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"BranchInstanceStep","column_name":"branch_instance_step_id","type":"uint64"}}',
     `log` VARCHAR(1024) NOT NULL DEFAULT '',
     `stdout` BOOLEAN DEFAULT 1, 
