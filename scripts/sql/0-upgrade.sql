@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `Repository` (
     CONSTRAINT `name` UNIQUE (`name`));
 
 CREATE TABLE IF NOT EXISTS `Branch` (
-    `branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+    `branch_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY comment '{"foreign_keys":[{"table_name":"BranchInstance","column_name":"branch_id","type":"uint64"}]}',
     `repository_id` BIGINT UNSIGNED NOT NULL comment '{"foreign_key":{"table_name":"Repository","column_name":"repository_id","type":"uint64"}}',
     `name` VARCHAR(255) NOT NULL DEFAULT '' comment '{"rules":["branch_name"]}', 
     `active` BOOLEAN DEFAULT 1, 
