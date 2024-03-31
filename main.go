@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	dao "github.com/matehaxor03/holistic_db_client/dao"
-	common "github.com/matehaxor03/holistic_common/common"
+	host_client "github.com/matehaxor03/holistic_host_client/host_client"
 )
 
 func main() {
@@ -18,6 +18,16 @@ func main() {
 
 func migrateDatabase() []error {
 	var errors []error
+	host_client_instance, host_client_errors := host_client.NewHostClient()
+	
+	if host_client_errors != nil {
+		return host_client_errors
+	}
+
+	host_user, host_user_errors  := host_client_instance.Whoami()
+	if host_user_errors != nil {
+		return host_user_errors
+	}
 
 	client_manager, client_manager_errors := dao.NewClientManager()
 	if client_manager_errors != nil {
@@ -77,7 +87,7 @@ func migrateDatabase() []error {
 
 	if desired == -1 && current == 0 {
 		fmt.Printf("database downgrading from current: %d desired: %d\n", current, desired)
-			downgrade_errors := runScript(database, &data_migration_record, current, "downgrade")
+			downgrade_errors := runScript(host_user, database, &data_migration_record, current, "downgrade")
 			if downgrade_errors != nil {
 				return downgrade_errors
 			} else {
@@ -93,7 +103,7 @@ func migrateDatabase() []error {
 		for current < desired {
 			fmt.Printf("database upgrading from current: %d desired: %d\n", current, desired)
 			current = current + 1
-			downgrade_errors := runScript(database, &data_migration_record, current, "upgrade")
+			downgrade_errors := runScript(host_user, database, &data_migration_record, current, "upgrade")
 			if downgrade_errors != nil {
 				return downgrade_errors
 			} else {
@@ -104,7 +114,7 @@ func migrateDatabase() []error {
 		for current > desired {
 			fmt.Printf("database downgrading from current: %d desired: %d\n", current, desired)
 			current = current - 1
-			downgrade_errors := runScript(database, &data_migration_record, current, "downgrade")
+			downgrade_errors := runScript(host_user, database, &data_migration_record, current, "downgrade")
 			if downgrade_errors != nil {
 				return downgrade_errors
 			} else {
@@ -118,15 +128,10 @@ func migrateDatabase() []error {
 	return nil
 }
 
-func runScript(database *dao.Database, data_migration_record *dao.Record, version int64, mode string) []error {
-	bashCommand := common.NewBashCommand()
-	directory_parts := common.GetDataDirectory()
-	directory := "/" 
-	for index, directory_part := range directory_parts {
-		directory += directory_part
-		if index < len(directory_parts) - 1 {
-			directory += "/"
-		}
+func runScript(host_user *host_client.User, database *dao.Database, data_migration_record *dao.Record, version int64, mode string) []error {
+	directory, directory_errors := host_user.GetDirectoryDBAbsoluteDirectory()
+	if directory_errors != nil {
+		return directory_errors
 	}
 	
 	var errors []error
@@ -143,7 +148,7 @@ func runScript(database *dao.Database, data_migration_record *dao.Record, versio
 	database_name := database.GetDatabaseName()
 	database_username := database.GetDatabaseUsername()
 	
-	_, sql_errors := bashCommand.ExecuteUnsafeCommandUsingFilesWithoutInputFile("/usr/local/mysql/bin/mysql --defaults-extra-file=" + directory + "/holistic_db_config#" + host_name + "#" + port_number + "#" + database_name + "#" + (*database_username) + ".config --host=" + host_name + " --port=" + port_number + " --protocol=TCP --wait --reconnect --batch < " + filename)
+	_, sql_errors := host_user.ExecuteUnsafeCommandUsingFilesWithoutInputFile("/usr/local/mysql/bin/mysql --defaults-extra-file=" + directory.GetPathAsString() + "/holistic_db_config#" + host_name + "#" + port_number + "#" + database_name + "#" + (*database_username) + ".config --host=" + host_name + " --port=" + port_number + " --protocol=TCP --wait --reconnect --batch < " + filename)
 
 	if sql_errors != nil {
 		errors = append(errors, sql_errors...)
