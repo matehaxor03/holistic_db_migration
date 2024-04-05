@@ -59,20 +59,12 @@ INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_Pull
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_DeleteInstanceFolder', -8000, @build_step_group_id_setup);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_CreateInstanceFolder', -7000, @build_step_group_id_setup);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_CopyToInstanceFolder', -6000, @build_step_group_id_setup);
-INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_CreateGroup', -5000, @build_step_group_id_setup);
-INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_CreateUser', -4000, @build_step_group_id_setup);
-INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_AssignGroupToUser', -3000, @build_step_group_id_setup);
-INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_AssignGroupToInstanceFolder', -2000, @build_step_group_id_setup);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_Clean', 0, @build_step_group_id_setup);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_Lint', 1000, @build_step_group_id_run);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_Build', 2000, @build_step_group_id_run);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_UnitTests', 3000, @build_step_group_id_run);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_IntegrationTests', 4000, @build_step_group_id_run);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_IntegrationTestSuite', 5000, @build_step_group_id_run);
-INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_RemoveGroupFromInstanceFolder', 11000, @build_step_group_id_teardown);
-INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_RemoveGroupFromUser', 12000, @build_step_group_id_teardown);
-INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_DeleteGroup', 13000, @build_step_group_id_teardown);
-INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_DeleteUser', 14000, @build_step_group_id_teardown);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_DeleteInstanceFolder', 15000, @build_step_group_id_teardown);
 INSERT INTO `BuildStep` (`name`,`order`,`build_step_group_id`) VALUES ('Run_End', 16000, @build_step_group_id_teardown);
 
